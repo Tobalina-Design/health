@@ -314,6 +314,15 @@ function lastExerciseLog(exerciseId){
   return entries[0]||null;
 }
 
+// Shim: fuera de Claude (GitHub Pages) window.storage no existe -> usar localStorage
+if(!window.storage){
+  window.storage = {
+    async get(key){ try{ const v=localStorage.getItem('cancha:'+key); return v===null ? null : {key, value:v}; }catch(e){ return null; } },
+    async set(key, value){ try{ localStorage.setItem('cancha:'+key, value); return {key, value}; }catch(e){ return null; } },
+    async delete(key){ try{ localStorage.removeItem('cancha:'+key); }catch(e){} return {key, deleted:true}; }
+  };
+}
+
 async function loadState(){
   try{
     const p=await window.storage.get('profile', false);
